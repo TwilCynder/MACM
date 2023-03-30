@@ -128,7 +128,7 @@ ENTITY RegisterBank IS
 		data_o_1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 		dest_reg : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 		data_i : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-                pc_in : in STD_LOGIC_VECTOR(31 downto 0);
+    pc_in : in STD_LOGIC_VECTOR(31 downto 0);
 		wr_reg : IN STD_LOGIC;
 		clk : IN STD_LOGIC
 	);
