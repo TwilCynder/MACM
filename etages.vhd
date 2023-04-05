@@ -36,9 +36,11 @@ begin
     (others => '0');
 
   pc_reg_in <= 
-    pc_inter when Bpris_EX = '1' else
-    npc_fw_br when Bpris_EX = '0' else 
+    pc_inter when Bpris_EX = '0' else
+    npc_fw_br when Bpris_EX = '1' else 
     (others => '0');
+
+  pc_plus_4 <= sig_pc_plus_4;
 
 end architecture;
 
@@ -109,27 +111,103 @@ USE IEEE.NUMERIC_STD.ALL;
 
 entity etageEX is
   port (
-    Op1_EX, Op2_Ex, ExtImm_EX, Res_fwd_ME, Res_fwd_ER : std_logic_vector (31 downto 0);
-    
+    Op1_EX, Op2_Ex, ExtImm_EX, Res_fwd_ME, Res_fwd_ER : in std_logic_vector (31 downto 0);
+    Op3_EX : in std_logic_vector(3 downto 0);
+    EA_EX, EB_EX, ALUCtrl_EX : in std_logic_vector(1 downto 0);
+    ALUSrc_EX : in std_logic;
+    Res_EX, WD_EX, npc_fw_br : out std_logic_vector(31 downto 0);
+    CC, Op3_EX_out : out std_logic_vector(3 downto 0)
   );
-end entity
+end entity;
+
+
+architecture etageEX_arch of etageEX is
+  signal ALUOp1, ALUOp2, Oper2, Res: std_logic_vector(31 downto 0);
+begin
+  Op3_EX_out <= Op3_EX;
+
+  alu: entity work.ALU 
+    port map(ALUOp1, ALUOp2, ALUCtrl_EX, Res, CC);
+
+  Res_EX <= Res;
+  npc_fw_br <= Res;
+
+  WD_EX <= Op2_EX;
+
+  ALUOp1 <= 
+    Op1_EX when EA_EX = "00" else
+    Res_fwd_ME when  EA_EX = "01" else
+    Res_fwd_ER when EA_EX = "10" else
+    (others => '0');
+
+  Oper2 <= 
+    Op2_EX when EB_EX = "00" else
+    Res_fwd_ME when  EB_EX = "01" else
+    Res_fwd_ER when EB_EX = "10" else
+    (others => '0');
+
+  ALUOp2 <= 
+    Oper2 when ALUSrc_EX = '0' else
+    ExtImm_EX when ALUSrc_EX = '1' else
+    (others => '0');
+
+  
+
+end architecture;
+
 -- -------------------------------------------------
 
 -- -- Etage ME
 
--- LIBRARY IEEE;
--- USE IEEE.STD_LOGIC_1164.ALL;
--- USE IEEE.NUMERIC_STD.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
--- entity etageME is
--- end entity
+entity etageME is
+  port (
+    Res_ME, WD_ME : in std_logic_vector(31 downto 0);
+    Op3_ME : in std_logic_vector(3 downto 0);
+    clk, MemWR_Mem : in std_logic;
+    Res_Mem_ME, Res_ALU_ME, Res_fwd_ME : out std_logic_vector(31 downto 0);
+    Op3_ME_out : out std_logic_vector(3 downto 0)
+  );
+end entity;
+
+architecture etageME_arch of etageME is
+begin
+  Res_ALU_ME <= Res_ME;
+  Res_fwd_ME <= Res_ME;
+  Op3_ME_out <= Op3_ME;
+
+  mem: entity work.data_mem 
+    port map (Res_ME, WD_ME, clk, MemWR_Mem, Res_Mem_ME);
+end architecture;
 -- -------------------------------------------------
 
 -- -- Etage ER
 
--- LIBRARY IEEE;
--- USE IEEE.STD_LOGIC_1164.ALL;
--- USE IEEE.NUMERIC_STD.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
--- entity etageER is
--- end entity
+entity etageER is
+  port (
+    Res_Mem_RE, Res_ALU_RE : in std_logic_vector (31 downto 0);
+    Op3_RE : in std_logic_vector (3 downto 0);
+    MemToReg_RE : in std_logic;
+    Res_RE : out std_logic_vector(31 downto 0);
+    Op3_RE_out : out std_logic_vector (3 downto 0)
+  );
+end entity;
+
+architecture etageER_arch of etageER is
+  begin
+
+    Op3_RE_out <= Op3_RE;
+
+    Res_RE <= 
+      Res_Mem_RE when MemToReg_RE = '1' else
+      Res_ALU_RE when MemToReg_RE = '0' else
+      (others => '0');
+
+  end architecture;
