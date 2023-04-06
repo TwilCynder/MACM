@@ -11,7 +11,7 @@ elab:	analysis
 	ghdl -e $(TEST_ENT) 
 
 simul: elab
-	ghdl -r $(TEST_ENT) --vcd=out.vcd
+	ghdl -r $(TEST_ENT) $(ARCH) --vcd=out.vcd
 
 clear:
 	clear
