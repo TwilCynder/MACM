@@ -1,6 +1,6 @@
 TEST_ENT = entite_test
 
-SRC = combi.vhd mem.vhd reg_bank.vhd etages.vhd proc.vhd test.vhd
+SRC = combi.vhd mem.vhd reg_bank.vhd decode.vhd etages.vhd proc.vhd test.vhd
 
 all: clear simul
 
