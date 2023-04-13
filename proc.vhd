@@ -6,7 +6,7 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
-
+--GEL LI VIENT DE LA GESTION DES ALEAS
 entity dataPath is
   port(
     clk,  ALUSrc_EX, MemWr_Mem, MemWr_RE, PCSrc_ER, Bpris_EX, Gel_LI, Gel_DI, RAZ_DI, RegWR, Clr_EX, MemToReg_RE : in std_logic;
@@ -71,7 +71,5 @@ begin
   -- RE
   re: entity work.etageER
     port map(Res_Mem_RE, Res_ALU_RE, Op3_RE, MemToReg_RE, Res_RE, Op3_RE_out);
-
-  
   
 end architecture;
